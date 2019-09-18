@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class Controller {
 	
 	@Autowired
-	private KafkaTemplate<String, String> template;
+	private KafkaTemplate<String, User> template;
 	
 	@PostMapping
-	public String send(@RequestBody String msg) {
+	public String send(@RequestBody User msg) {
 		
 		final String TOPIC = "kafka-estudo";
       
@@ -39,11 +39,11 @@ public class Controller {
 		return "Enviado";
 	}
 	
-	private void sendTradeToTopic(String topic, String securityId, int idStart, int idEnd,String  msg) {
+	private void sendTradeToTopic(String topic, String securityId, int idStart, int idEnd,User  user) {
         for (int i = idStart; i <= idEnd; i++) {
             try {
-                template.send(new ProducerRecord<String, String>(topic, securityId, msg));
-                System.out.println("Sending to " + topic + "msg : " + msg + " to: " +securityId);
+                template.send(new ProducerRecord<String, User>(topic, securityId, new User(user.getNome(), user.getEmail())));
+                System.out.println("Sending to " + topic + "msg : " + user + " to: " +securityId);
             } catch (Exception e) {
                 e.printStackTrace();
             }
