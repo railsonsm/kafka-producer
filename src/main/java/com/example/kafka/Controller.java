@@ -1,7 +1,9 @@
 package com.example.kafka;
 
-import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +20,33 @@ public class Controller {
 	
 	@PostMapping
 	public String send(@RequestBody String msg) {
-		template.send("estudo-kafka" , 0, UUID.randomUUID().toString(), msg);
+		
+		final String TOPIC = "kafka-estudo";
+      
+        Runnable task1 = () -> sendTradeToTopic(TOPIC, "ABCD", 1, 5, msg);
+        Runnable task2 = () -> sendTradeToTopic(TOPIC, "PQ1234@1211111111111", 6, 10, msg);
+        Runnable task3 = () -> sendTradeToTopic(TOPIC, "ZX12345OOO", 11, 15, msg);
+ 
+        
+        ExecutorService executorService = Executors.newFixedThreadPool(3);
+        executorService.submit(task1);
+        executorService.submit(task2);
+        executorService.submit(task3);
+ 
+        executorService.shutdown();
+
+		//template.send(new ProducerRecord<String, String>("kafka", "teste", msg));
 		return "Enviado";
 	}
+	
+	private void sendTradeToTopic(String topic, String securityId, int idStart, int idEnd,String  msg) {
+        for (int i = idStart; i <= idEnd; i++) {
+            try {
+                template.send(new ProducerRecord<String, String>(topic, securityId, msg));
+                System.out.println("Sending to " + topic + "msg : " + msg + " to: " +securityId);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

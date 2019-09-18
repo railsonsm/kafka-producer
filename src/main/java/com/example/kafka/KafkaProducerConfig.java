@@ -45,7 +45,7 @@ public class KafkaProducerConfig {
 	 
     @Bean
     public NewTopic topic1() {
-         return new NewTopic("estudo-kafka" , 1, (short) 1);
+         return new NewTopic("kafka-estudo" , 3, (short) 1);
     }
 
 }
